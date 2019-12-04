@@ -12,11 +12,10 @@ def main():
         print("{} does not exist".format(file_py))
         return
     subprocess.check_output("pyinstaller -F {}".format(file_py), stderr=subprocess.STDOUT, shell=True)
-    # move exe to local
+    # move exe to local dir
     file_name = file_py[file_py.rfind('/')+1:-3]
-    file_exe = "dist/{}.exe".format(file_name)
-    if os.path.isfile(file_exe):
-        shutil.move(file_exe, "./")
+    if os.path.isfile("dist/{}.exe".format(file_name)):
+        shutil.move("dist/{}.exe".format(file_name), "./{}.exe".format(file_name))
     # remove ...
     os.remove("{}.spec".format(file_name))
     shutil.rmtree("build")
