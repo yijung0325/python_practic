@@ -2,30 +2,31 @@ from pytchat import LiveChat
 import datetime as dt
 import requests
 from bs4 import BeautifulSoup
-import json
 
 def get_stream_url():
-
-#    user = "Chifar899"
-#    url_videos = "https://www.youtube.com/user/{}/videos?view=2".format(user)
-
-    url_videos = "https://www.youtube.com/c/hsuantien/videos"
-    req = requests.get(url_videos)
-    soup = BeautifulSoup(req.text, "lxml")
-
-    with open("xml.txt", mode='w', encoding="utf-8") as fw:
-        fw.write(req.text)
-    
-    
-    
-
-#    print(video_titles)
-
-    return
+    # query Yong-Nien Lee (in Chinese) on YouTube to get the video ID of the latest stran
+    url_yt = "https://www.youtube.com"
+    user = "Chifar899"
+    query = "%E6%9D%8E%E6%B0%B8%E5%B9%B4"
+    url_query = "{}/user/{}/search?query={}".format(url_yt, user, query)
+    req = requests.get(url_query)
+    soup = BeautifulSoup(req.content, "html.parser")
+    str_target = "window[\"ytInitialData\"] = "
+    video_id = None
+    for scc in soup.select("script"):
+        str_soup = str(scc.string).strip()
+        if bool(str_soup) and str_soup[:len(str_target)]==str_target:
+            str_soup = str_soup[len(str_target):]
+            # find videoId
+            str_target = "\"videoId\":\""
+            id_target = str_soup.find(str_target)
+            id_end = str_soup.find('\",', id_target)
+            video_id = str_soup[id_target+len(str_target):id_end]
+            break
+    return "{}/watch?v={}".format(url_yt, video_id)
 
 def main():
     yt_url = get_stream_url()
-    yt_url = "https://www.youtube.com/watch?v=X2MuyEyZz-0"
     livechat = LiveChat(yt_url)
     hour_start = 19
     min_start = 30
